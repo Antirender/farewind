@@ -1,0 +1,147 @@
+/* ── FareWind Design Tokens ──────────────────────────── */
+
+/* Dark theme (default) */
+:root,
+[data-theme='dark'] {
+  --color-bg: #0c0e14;
+  --color-surface: #151821;
+  --color-surface-alt: #1c2030;
+  --color-surface-hover: #222738;
+  --color-border: #272d42;
+  --color-text: #e8e9ed;
+  --color-text-secondary: #b0b4c3;
+  --color-text-muted: #6e7490;
+  --color-primary: #6366f1;
+  --color-primary-light: #818cf8;
+  --color-primary-bg: rgba(99, 102, 241, 0.1);
+  --color-accent: #22d3ee;
+  --color-success: #34d399;
+  --color-success-bg: rgba(52, 211, 153, 0.1);
+  --color-warning: #fbbf24;
+  --color-warning-bg: rgba(251, 191, 36, 0.1);
+  --color-danger: #f87171;
+  --color-danger-bg: rgba(248, 113, 113, 0.1);
+  --shadow-card: 0 2px 16px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+  color-scheme: dark;
+}
+
+/* Light theme */
+[data-theme='light'] {
+  --color-bg: #f5f6fa;
+  --color-surface: #ffffff;
+  --color-surface-alt: #f0f1f5;
+  --color-surface-hover: #e9eaf0;
+  --color-border: #d8dae3;
+  --color-text: #1a1c24;
+  --color-text-secondary: #4a4e5e;
+  --color-text-muted: #7c8098;
+  --color-primary: #4f46e5;
+  --color-primary-light: #6366f1;
+  --color-primary-bg: rgba(79, 70, 229, 0.08);
+  --color-accent: #0891b2;
+  --color-success: #059669;
+  --color-success-bg: rgba(5, 150, 105, 0.08);
+  --color-warning: #d97706;
+  --color-warning-bg: rgba(217, 119, 6, 0.08);
+  --color-danger: #dc2626;
+  --color-danger-bg: rgba(220, 38, 38, 0.08);
+  --shadow-card: 0 1px 8px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 4px 24px rgba(0, 0, 0, 0.12);
+  color-scheme: light;
+}
+
+/* Typography */
+:root {
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  --space-3xl: 4rem;
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+}
+
+/* ── Reset ───────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.6;
+  min-height: 100dvh;
+  transition: background 0.3s, color 0.3s;
+}
+
+a {
+  color: var(--color-primary-light);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+img, svg {
+  display: block;
+  max-width: 100%;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+input, select, textarea {
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+/* ── Scrollbar ───────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+}
+
+/* ── Utility ─────────────────────────────────────────── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ── Responsive breakpoints (used via media queries) ─── */
+/* mobile: default, tablet: 640px+, desktop: 1024px+ */

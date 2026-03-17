@@ -1,0 +1,86 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-bottom: var(--space-xl);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.heading {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.sub {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+/* ── Route switcher ───────────────────── */
+.routeSwitcher {
+  display: flex;
+  gap: 0.375rem;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+}
+
+.routeTab {
+  padding: 0.35rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 100px;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.routeTab:hover {
+  background: var(--color-surface-alt);
+  color: var(--color-text);
+}
+
+.routeTabActive {
+  background: var(--color-primary-bg);
+  border-color: var(--color-primary);
+  color: var(--color-primary-light);
+}
+
+/* ── Time range bar ───────────────────── */
+.rangeBar {
+  display: flex;
+  gap: 0.25rem;
+  background: var(--color-surface-alt);
+  border-radius: var(--radius-sm);
+  padding: 3px;
+  width: fit-content;
+}
+
+.rangeBtn {
+  padding: 0.3rem 0.75rem;
+  border: none;
+  border-radius: var(--radius-xs);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.rangeBtn:hover {
+  color: var(--color-text);
+}
+
+.rangeBtnActive {
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--shadow-card);
+}

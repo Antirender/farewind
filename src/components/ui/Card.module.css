@@ -1,0 +1,32 @@
+.card {
+  border-radius: var(--radius-lg);
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.default {
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.outlined {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.highlighted {
+  background: var(--color-primary-bg);
+  border: 1px solid var(--color-primary);
+}
+
+.clickable {
+  cursor: pointer;
+}
+.clickable:hover {
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-primary);
+}
+
+.pad-none { padding: 0; }
+.pad-sm   { padding: var(--space-sm) var(--space-md); }
+.pad-md   { padding: var(--space-md) var(--space-lg); }
+.pad-lg   { padding: var(--space-lg) var(--space-xl); }

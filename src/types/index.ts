@@ -1,0 +1,54 @@
+export interface Route {
+  id: string;
+  name: string;
+  origin: string;
+  destination: string;
+  originCoords: [number, number]; // [lat, lng]
+  destCoords: [number, number];
+  provider: string;
+  rideType: string;
+  createdAt: string;
+}
+
+export interface RideEntry {
+  id: string;
+  routeId: string;
+  price: number;
+  currency: string;
+  date: string;          // ISO date-time
+  dayOfWeek: number;     // 0=Sun … 6=Sat
+  hour: number;          // 0–23
+  surgeMultiplier?: number;
+  notes?: string;
+}
+
+export interface HeatmapCell {
+  day: number;
+  hour: number;
+  avgPrice: number;
+  count: number;
+}
+
+export interface Recommendation {
+  id: string;
+  routeId: string;
+  type: 'cheapest_time' | 'avoid_surge' | 'general';
+  title: string;
+  body: string;
+  reasoning: string;
+  estimatedSaving?: number;
+}
+
+export type OnboardingStep = {
+  title: string;
+  body: string;
+  visual: 'wave' | 'clock' | 'chart' | 'spark';
+};
+
+export type ThemeMode = 'light' | 'dark';
+
+export interface UserPreferences {
+  theme: ThemeMode;
+  hasOnboarded: boolean;
+  defaultCurrency: string;
+}
