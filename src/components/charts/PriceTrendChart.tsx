@@ -64,10 +64,10 @@ export default function PriceTrendChart({ entries }: Props) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '0.75rem 0.75rem 0.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
         <div>
           <h3 style={{ fontSize: '0.9375rem', fontWeight: 700, color: 'var(--color-text)', marginBottom: '0.125rem' }}>
-            Price Trend
+            Are your fares going up or down?
           </h3>
           <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', lineHeight: 1.4 }}>
-            Fare over time. Drag the brush below to zoom into a date range.
+            Each dot is a ride. Drag the brush below the chart to zoom into any date range.
           </p>
         </div>
         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
@@ -223,13 +223,23 @@ export default function PriceTrendChart({ entries }: Props) {
       </ResponsiveContainer>
 
       {/* Annotation footer */}
-      <div style={{ padding: '0.375rem 0.75rem 0.5rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-        <span style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)' }}>
-          ● Yellow dots indicate surge pricing rides
-        </span>
-        <span style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)' }}>
-          ─ ─ Dashed line shows average fare
-        </span>
+      <div style={{ padding: '0.5rem 0.75rem 0.625rem', borderTop: '1px solid var(--color-border)', marginTop: '0.25rem' }}>
+        <p style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', lineHeight: 1.6, marginBottom: '0.375rem' }}>
+          {surgeCount > 0
+            ? `Look for clusters of yellow dots — those are surge-priced rides (${pctSurge}% of total). The dashed line marks your average fare of $${avg.toFixed(2)}.`
+            : `No surge pricing detected so far. The dashed line marks your average fare of $${avg.toFixed(2)}.`}
+        </p>
+        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+          <span style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+            <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', backgroundColor: '#fbbf24' }} /> Surge ride
+          </span>
+          <span style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+            <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', backgroundColor: 'var(--color-primary)' }} /> Normal ride
+          </span>
+          <span style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+            <span style={{ display: 'inline-block', width: 16, height: 0, borderTop: '2px dashed var(--color-primary-light)' }} /> Average
+          </span>
+        </div>
       </div>
     </Card>
   );

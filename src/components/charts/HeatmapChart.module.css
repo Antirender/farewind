@@ -152,10 +152,37 @@
 /* ── Legend ────────────────────────────── */
 .legend {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.375rem 0.75rem 0.625rem;
-  justify-content: center;
+  gap: 0.25rem;
+  padding: 0.5rem 0.75rem 0.125rem;
+}
+
+.legendRow {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.legendSwatches {
+  display: flex;
+  gap: 2px;
+}
+
+.legendSwatch {
+  width: 24px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+.legendLabels {
+  display: flex;
+  justify-content: space-between;
+  width: 160px;
+  font-size: 0.5625rem;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .legendLabel {
@@ -165,11 +192,23 @@
   white-space: nowrap;
 }
 
-.legendBar {
-  width: 120px;
-  height: 8px;
-  border-radius: 4px;
-  background: linear-gradient(to right, #34d399, #fbbf24, #f87171);
+/* ── Chart Footer ─────────────────────── */
+.chartFooter {
+  padding: 0.5rem 0.75rem 0.625rem;
+  border-top: 1px solid var(--color-border);
+  margin-top: 0.25rem;
+}
+
+.chartFooterText {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin-bottom: 0.25rem;
+}
+
+.chartFooterHint {
+  font-size: 0.6875rem;
+  color: var(--color-text-muted);
 }
 
 /* ── Responsive ───────────────────────── */

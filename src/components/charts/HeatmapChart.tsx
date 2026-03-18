@@ -108,9 +108,9 @@ export default function HeatmapChart({ entries }: Props) {
     <Card padding="sm">
       <div className={styles.chartHeader}>
         <div>
-          <h3 className={styles.chartTitle}>Price Heatmap</h3>
+          <h3 className={styles.chartTitle}>When is the cheapest time to ride?</h3>
           <p className={styles.chartDesc}>
-            Average fare by day &amp; hour. Hover to explore, click to pin.
+            This grid shows your average fare for each day × hour slot. Green = cheap, red = expensive. Hover to explore, click to pin a cell.
           </p>
         </div>
         <div className={styles.annotations}>
@@ -230,13 +230,37 @@ export default function HeatmapChart({ entries }: Props) {
 
       {/* Legend */}
       <div className={styles.legend}>
-        <span className={styles.legendLabel}>
-          ${min === Infinity ? '—' : min.toFixed(0)} Low
-        </span>
-        <div className={styles.legendBar} />
-        <span className={styles.legendLabel}>
-          ${max === -Infinity ? '—' : max.toFixed(0)} High
-        </span>
+        <div className={styles.legendRow}>
+          <span className={styles.legendLabel}>
+            ${min === Infinity ? '—' : min.toFixed(2)}
+          </span>
+          <div className={styles.legendSwatches}>
+            <div className={styles.legendSwatch} style={{ background: 'rgb(52,211,153)' }} />
+            <div className={styles.legendSwatch} style={{ background: 'rgb(152,201,95)' }} />
+            <div className={styles.legendSwatch} style={{ background: 'rgb(251,191,36)' }} />
+            <div className={styles.legendSwatch} style={{ background: 'rgb(250,152,75)' }} />
+            <div className={styles.legendSwatch} style={{ background: 'rgb(248,113,113)' }} />
+          </div>
+          <span className={styles.legendLabel}>
+            ${max === -Infinity ? '—' : max.toFixed(2)}
+          </span>
+        </div>
+        <div className={styles.legendLabels}>
+          <span>Cheapest</span>
+          <span>Most expensive</span>
+        </div>
+      </div>
+
+      {/* Annotation footer */}
+      <div className={styles.chartFooter}>
+        <p className={styles.chartFooterText}>
+          {cheapCell.day && peakCell.day
+            ? `Your cheapest window is ${cheapCell.day} around ${cheapCell.hour}:00 ($${cheapCell.avg.toFixed(2)} avg). Avoid ${peakCell.day} ${peakCell.hour}:00 when fares peak at $${peakCell.avg.toFixed(2)}.`
+            : 'Log more rides to reveal pricing patterns across the week.'}
+        </p>
+        <p className={styles.chartFooterHint}>
+          Grey cells = no ride data yet for that time slot.
+        </p>
       </div>
     </Card>
   );

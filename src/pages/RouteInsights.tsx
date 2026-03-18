@@ -117,10 +117,19 @@ export default function RouteInsights() {
       {view === 'overview' ? (
         <>
           {/* Stats */}
-          <StatsBar entries={routeEntries} />
+          <section aria-label="Fare summary">
+            <h3 className={styles.sectionLabel}>📊 Your Numbers</h3>
+            <StatsBar entries={routeEntries} />
+          </section>
           {/* Charts */}
-          <PriceTrendChart entries={routeEntries} />
-          <HeatmapChart entries={routeEntries} />
+          <section aria-label="Price over time">
+            <h3 className={styles.sectionLabel}>📈 Price Over Time</h3>
+            <PriceTrendChart entries={routeEntries} />
+          </section>
+          <section aria-label="When to ride">
+            <h3 className={styles.sectionLabel}>🗓 When to Ride</h3>
+            <HeatmapChart entries={routeEntries} />
+          </section>
         </>
       ) : (
         <>

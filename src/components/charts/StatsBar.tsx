@@ -10,11 +10,10 @@ interface Props {
 export default function StatsBar({ entries }: Props) {
   if (entries.length === 0) return null;
 
-  const { prices, avg, min, max, p25, p75, range } = useMemo(() => {
+  const { avg, min, max, p25, p75, range } = useMemo(() => {
     const p = entries.map((e) => e.price).sort((a, b) => a - b);
     const a = p.reduce((s, pr) => s + pr, 0) / p.length;
     return {
-      prices: p,
       avg: a,
       min: p[0],
       max: p[p.length - 1],
@@ -39,9 +38,9 @@ export default function StatsBar({ entries }: Props) {
   return (
     <Card padding="sm">
       <div className={styles.header}>
-        <h3 className={styles.title}>Fare Summary</h3>
+        <h3 className={styles.title}>How much are you actually paying?</h3>
         <p className={styles.desc}>
-          {entries.length} ride{entries.length > 1 ? 's' : ''} · spread ${range.toFixed(2)}
+          Across {entries.length} ride{entries.length > 1 ? 's' : ''}, your fares range from ${min.toFixed(2)} to ${max.toFixed(2)} — a ${range.toFixed(2)} spread.
         </p>
       </div>
 

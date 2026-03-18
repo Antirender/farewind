@@ -15,7 +15,7 @@ This repository documents two development stages: an initial MVP and a portfolio
 
 ## Stage 1 — MVP
 
-The initial build established the full five-page product flow:
+The initial build established the core product flow:
 
 | Page | Purpose |
 |---|---|
@@ -41,10 +41,21 @@ The MVP objective was to prove the core concept: FareWind can surface meaningful
 
 The second iteration transformed the MVP into a more realistic, responsive, and interpretable product prototype.
 
+### Pages (6 total)
+
+| Page | Route | Purpose |
+|---|---|---|
+| Onboarding | `/onboarding` | Scrollama scroll-driven walkthrough |
+| Saved Routes | `/` | Route cards with nicknames, avg fare, ride count |
+| Add Ride Entry | `/add` | Log a new fare with date, price, surge |
+| Route Insights | `/insights/:routeId` | Interactive charts, heatmap, stats breakdown |
+| Route Map | `/map` | Full-page Leaflet map with sidebar, colour-coded routes |
+| Recommendations | `/recommendation` | Rule-based advice with estimated savings |
+
 ### Data & Types
-- `Route` extended with `provider`, `rideType`, and geographic coordinates (`originCoords`, `destCoords`)
+- `Route` extended with `name` (user-friendly nickname e.g. "Home → School"), `provider`, `rideType`, and geographic coordinates (`originCoords`, `destCoords`)
 - `Recommendation` redesigned with `id`, `type`, `title`, `body`, `reasoning`, and `estimatedSaving` — structured as a product-facing decision object rather than a raw string
-- Seed data rebuilt around real Oakville, ON addresses (home ↔ school, home ↔ Pearson Airport, home ↔ Union Station Toronto) with bidirectional route pairs, natural gaps in ride history (skipped days, low-frequency airport trips), and realistic weekday/weekend surge patterns
+- Seed data built around real Oakville, ON addresses (home ↔ school, home ↔ Pearson Airport, home ↔ downtown) with bidirectional route pairs, natural gaps in ride history, and realistic weekday/weekend surge patterns
 
 ### State & Persistence
 - `localStorage` persistence for theme preference (`fw_theme`) and onboarding completion (`fw_onboarded`)
@@ -56,27 +67,37 @@ The second iteration transformed the MVP into a more realistic, responsive, and 
 - Design tokens: colour, spacing, radius, typography (`Inter` + `JetBrains Mono`)
 - Responsive breakpoints (mobile-first, tablet ≥ 640 px, desktop ≥ 1024 px)
 - Polished component set: `Button` (4 variants, 3 sizes), `Card` (3 styles), `Badge` (5 colours), `Tooltip` with `InfoIcon`
+- Accessible `:focus-visible` outlines, `::selection` styling
 
-### Page Improvements
+### Page Details
 
 **Onboarding**  
 Redesigned with Scrollama scroll-driven steps, a sticky visual panel (emoji + animated pop-in), progress dots, step counter, and a skip button. On mobile the layout stacks vertically. A replay button in the header lets users revisit the flow at any time.
 
 **Saved Routes**  
-Route cards now surface average fare, ride count, last ride date, and provider alongside a coloured badge. A responsive grid adapts from 1 → 2 → 3 columns.
+Route cards show nickname (e.g. "Home → School") with full addresses as grey subtitles. Cards surface average fare, ride count, last ride date, and provider alongside a coloured badge. A responsive grid adapts from 1 → 2 → 3 columns.
 
 **Add Ride Entry**  
 Fields are grouped logically. Each field label carries a `Tooltip`/`InfoIcon` explaining what to enter and why. A green success animation plays on save before redirecting.
 
 **Route Insights**  
-- Route-switcher pill row to jump between routes without leaving the page
+- Route-switcher pill row to jump between routes
 - 7-day / 30-day / All time-range filter
-- `StatsBar` showing Avg, Min, Max, P25, P75, and ride count
-- OpenStreetMap tile map (Leaflet + `react-leaflet`) with origin/destination markers and a dashed polyline — replaces the abstract point-to-point metaphor with real geographic context
-- Improved `PriceTrendChart` (area gradient) and completely rebuilt `HeatmapChart` (correct day × hour grid, green → yellow → red scale, hover tooltip)
+- **Overview / Weekday vs Weekend** view toggle with comparison cards
+- Semantic section labels ("📊 Your Numbers", "📈 Price Over Time", "🗓 When to Ride")
+- `StatsBar` with insight-oriented title, mini range bar (P25–P75 fill + average marker)
+- `PriceTrendChart` with Brush zoom, surge toggle, ReferenceLine for avg, yellow dots for surged rides, and annotation footer explaining what to notice
+- `HeatmapChart` rebuilt as CSS Grid — day × hour click/hover interactive cells, explicit colour legend (green → yellow → red with labelled swatches), footer annotation highlighting cheapest/peak windows
+
+**Route Map**  
+Full-page Leaflet map with sidebar route list, colour-coded polylines, route selection, and stats overlay.
 
 **Recommendations**  
 Three rule types — *cheapest time*, *surge avoidance*, *weekday vs weekend* — each backed by a `reasoning` string explaining the data it relied on, and an `estimatedSaving` value in CAD. Cards display the saving amount prominently so the advice feels actionable.
+
+### Deployment
+
+Deployed on Vercel. A `vercel.json` rewrite rule ensures SPA client-side routing works on page refresh.
 
 ---
 
