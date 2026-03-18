@@ -6,6 +6,7 @@ import SavedRoutes from './pages/SavedRoutes';
 import AddRideEntry from './pages/AddRideEntry';
 import RouteInsights from './pages/RouteInsights';
 import Recommendation from './pages/Recommendation';
+import RouteMapPage from './pages/RouteMapPage';
 
 export default function App() {
   const { hasOnboarded } = useApp();
@@ -20,6 +21,7 @@ export default function App() {
         <Route path="/" element={<SavedRoutes />} />
         <Route path="/add" element={<AddRideEntry />} />
         <Route path="/insights/:routeId" element={<RouteInsights />} />
+        <Route path="/map" element={<RouteMapPage />} />
         <Route path="/recommendation" element={<Recommendation />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

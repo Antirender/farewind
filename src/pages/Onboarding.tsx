@@ -73,7 +73,11 @@ export default function Onboarding() {
       {/* Scrollable text steps */}
       <div className={styles.scroller}>
         {STEPS.map((s, i) => (
-          <div key={i} className={styles.step} data-step={i}>
+          <div
+            key={i}
+            className={`${styles.step} ${i === currentStep ? styles.stepActive : ''}`}
+            data-step={i}
+          >
             <h2 className={styles.title}>{s.title}</h2>
             <p className={styles.body}>{s.body}</p>
             {i === STEPS.length - 1 && (

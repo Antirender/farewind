@@ -6,6 +6,7 @@ import styles from './AppShell.module.css';
 const NAV = [
   { to: '/', label: 'Routes', icon: '🗂' },
   { to: '/add', label: 'Add Ride', icon: '＋' },
+  { to: '/map', label: 'Map', icon: '🗺' },
   { to: '/recommendation', label: 'Advice', icon: '💡' },
 ];
 

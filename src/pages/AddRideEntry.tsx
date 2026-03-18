@@ -67,7 +67,7 @@ export default function AddRideEntry() {
             <select value={routeId} onChange={(e) => setRouteId(e.target.value)} className={styles.input} required>
               {routes.map((r) => (
                 <option key={r.id} value={r.id}>
-                  {r.origin} → {r.destination}
+                  {r.name} — {r.origin} → {r.destination}
                 </option>
               ))}
             </select>

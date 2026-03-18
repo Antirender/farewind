@@ -42,7 +42,7 @@ function generateRecommendations(
     }
 
     const saving = expensiveAvg - cheapestAvg;
-    const routeLabel = `${route.origin.split(',')[0]} → ${route.destination.split(',')[0]}`;
+    const routeLabel = route.name;
 
     recs.push({
       id: `rec-${id++}`,

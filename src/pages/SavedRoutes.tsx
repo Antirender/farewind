@@ -35,10 +35,11 @@ export default function SavedRoutes() {
               className={styles.card}
             >
               <div className={styles.cardHeader}>
-                <span className={styles.routeName}>{r.origin}</span>
-                <span className={styles.arrow}>→</span>
-                <span className={styles.routeName}>{r.destination}</span>
+                <span className={styles.routeNick}>{r.name}</span>
               </div>
+              <p className={styles.routeAddr}>
+                {r.origin} → {r.destination}
+              </p>
 
               <div className={styles.meta}>
                 <Badge color={count > 10 ? 'success' : count > 0 ? 'primary' : 'neutral'}>

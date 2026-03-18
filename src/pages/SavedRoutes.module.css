@@ -44,15 +44,28 @@
   flex-wrap: wrap;
 }
 
-.routeName {
-  font-weight: 600;
-  font-size: 0.9375rem;
+.routeNick {
+  font-weight: 700;
+  font-size: 1.0625rem;
   color: var(--color-text);
+}
+
+.routeAddr {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  margin-top: -0.25rem;
 }
 
 .arrow {
   color: var(--color-primary-light);
   font-weight: 700;
+}
+
+.routeName {
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: var(--color-text);
 }
 
 .meta {
