@@ -64,6 +64,7 @@ interface AppState {
   completeOnboarding: () => void;
   resetOnboarding: () => void;
   toggleTheme: () => void;
+  resetToDemo: () => void;
   getEntriesForRoute: (routeId: string) => RideEntry[];
   getRoute: (routeId: string) => Route | undefined;
 }
@@ -71,6 +72,7 @@ interface AppState {
 const AppContext = createContext<AppState | null>(null);
 
 let nextId = Date.now();
+const THEME_CYCLE: ThemeMode[] = ['dark', 'light', 'pink', 'blue'];
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [routes, setRoutes] = useState<Route[]>(() =>
@@ -135,10 +137,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const completeOnboarding = useCallback(() => setHasOnboarded(true), []);
   const resetOnboarding = useCallback(() => setHasOnboarded(false), []);
+
   const toggleTheme = useCallback(
-    () => setTheme((t) => (t === 'dark' ? 'light' : 'dark')),
+    () => setTheme((t) => {
+      const idx = THEME_CYCLE.indexOf(t);
+      return THEME_CYCLE[(idx + 1) % THEME_CYCLE.length];
+    }),
     [],
   );
+
+  const resetToDemo = useCallback(() => {
+    setRoutes(seedRoutes);
+    setEntries(seedEntries);
+  }, []);
 
   const getEntriesForRoute = useCallback(
     (routeId: string) => entries.filter((e) => e.routeId === routeId),
@@ -164,6 +175,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         completeOnboarding,
         resetOnboarding,
         toggleTheme,
+        resetToDemo,
         getEntriesForRoute,
         getRoute,
       }}

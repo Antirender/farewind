@@ -8,9 +8,9 @@
   --color-surface-alt: #1c2030;
   --color-surface-hover: #222738;
   --color-border: #272d42;
-  --color-text: #e8e9ed;
-  --color-text-secondary: #b0b4c3;
-  --color-text-muted: #6e7490;
+  --color-text: #ecedf1;
+  --color-text-secondary: #b8bccb;
+  --color-text-muted: #8a90a8;
   --color-primary: #6366f1;
   --color-primary-light: #818cf8;
   --color-primary-bg: rgba(99, 102, 241, 0.1);
@@ -35,19 +35,69 @@
   --color-border: #d8dae3;
   --color-text: #1a1c24;
   --color-text-secondary: #4a4e5e;
-  --color-text-muted: #7c8098;
+  --color-text-muted: #6b6f82;
   --color-primary: #4f46e5;
   --color-primary-light: #6366f1;
   --color-primary-bg: rgba(79, 70, 229, 0.08);
   --color-accent: #0891b2;
-  --color-success: #059669;
-  --color-success-bg: rgba(5, 150, 105, 0.08);
-  --color-warning: #d97706;
-  --color-warning-bg: rgba(217, 119, 6, 0.08);
-  --color-danger: #dc2626;
-  --color-danger-bg: rgba(220, 38, 38, 0.08);
+  --color-success: #047857;
+  --color-success-bg: rgba(4, 120, 87, 0.08);
+  --color-warning: #b45309;
+  --color-warning-bg: rgba(180, 83, 9, 0.08);
+  --color-danger: #b91c1c;
+  --color-danger-bg: rgba(185, 28, 28, 0.08);
   --shadow-card: 0 1px 8px rgba(0, 0, 0, 0.08);
   --shadow-lg: 0 4px 24px rgba(0, 0, 0, 0.12);
+  color-scheme: light;
+}
+
+/* Pink theme — warm rose/blush palette */
+[data-theme='pink'] {
+  --color-bg: #fdf2f4;
+  --color-surface: #ffffff;
+  --color-surface-alt: #fce7eb;
+  --color-surface-hover: #f9d5dc;
+  --color-border: #e8b4bf;
+  --color-text: #1f1215;
+  --color-text-secondary: #5c3a42;
+  --color-text-muted: #8c6570;
+  --color-primary: #be185d;
+  --color-primary-light: #db2777;
+  --color-primary-bg: rgba(190, 24, 93, 0.08);
+  --color-accent: #a21caf;
+  --color-success: #047857;
+  --color-success-bg: rgba(4, 120, 87, 0.08);
+  --color-warning: #b45309;
+  --color-warning-bg: rgba(180, 83, 9, 0.08);
+  --color-danger: #b91c1c;
+  --color-danger-bg: rgba(185, 28, 28, 0.08);
+  --shadow-card: 0 1px 8px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 4px 24px rgba(0, 0, 0, 0.1);
+  color-scheme: light;
+}
+
+/* Blue theme — cool ocean palette */
+[data-theme='blue'] {
+  --color-bg: #f0f5ff;
+  --color-surface: #ffffff;
+  --color-surface-alt: #e0ebff;
+  --color-surface-hover: #cfdffc;
+  --color-border: #a8c1e8;
+  --color-text: #111827;
+  --color-text-secondary: #334155;
+  --color-text-muted: #64748b;
+  --color-primary: #1d4ed8;
+  --color-primary-light: #3b82f6;
+  --color-primary-bg: rgba(29, 78, 216, 0.08);
+  --color-accent: #0e7490;
+  --color-success: #047857;
+  --color-success-bg: rgba(4, 120, 87, 0.08);
+  --color-warning: #b45309;
+  --color-warning-bg: rgba(180, 83, 9, 0.08);
+  --color-danger: #b91c1c;
+  --color-danger-bg: rgba(185, 28, 28, 0.08);
+  --shadow-card: 0 1px 8px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 4px 24px rgba(0, 0, 0, 0.1);
   color-scheme: light;
 }
 

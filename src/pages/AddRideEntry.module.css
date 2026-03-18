@@ -13,7 +13,39 @@
 .sub {
   color: var(--color-text-muted);
   font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+/* ── Tabs ─────────────────────────────── */
+.tabs {
+  display: flex;
+  gap: 0.5rem;
   margin-bottom: 1.25rem;
+}
+
+.tab {
+  flex: 1;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-alt);
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+}
+
+.tab:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text-secondary);
+}
+
+.tabActive {
+  background: var(--color-primary-bg);
+  border-color: var(--color-primary);
+  color: var(--color-primary-light);
 }
 
 .form {
@@ -58,6 +90,11 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
+}
+
+.formError {
+  font-size: 0.75rem;
+  color: var(--color-danger);
 }
 
 .success {

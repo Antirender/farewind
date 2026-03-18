@@ -1,4 +1,4 @@
-import type { Route, RideEntry, OnboardingStep } from '../types';
+import type { Route, RideEntry } from '../types';
 
 /* ── deterministic seeded random ─────────────────────── */
 function seededRandom(seed: number) {
@@ -14,217 +14,185 @@ const rand = seededRandom(42);
 let _id = 0;
 const uid = () => `entry-${++_id}`;
 
-function randomPrice(base: number, variance: number) {
-  return +(base + (rand() - 0.5) * 2 * variance).toFixed(2);
+/* ── GTA Uber fare model (CAD, early-2026 rates) ────── */
+function uberFare(km: number, min: number, surge: number): number {
+  const raw = (3.25 + 0.20 * min + 0.88 * km + 2.50) * (0.80 + rand() * 0.40);
+  return +(raw * surge).toFixed(2);
+}
+
+function surgeFactor(hour: number, dow: number): number {
+  const wd = dow >= 1 && dow <= 5;
+  if (wd && hour >= 7 && hour <= 9)    return +(1.2 + rand() * 0.9).toFixed(2);
+  if (wd && hour >= 14 && hour <= 15)  return +(1.0 + rand() * 0.3).toFixed(2);
+  if (wd && hour >= 17 && hour <= 19)  return +(1.3 + rand() * 1.0).toFixed(2);
+  if (hour >= 22 || hour <= 2)         return +(1.4 + rand() * 1.1).toFixed(2);
+  if (!wd && hour >= 8 && hour <= 11)  return +(1.0 + rand() * 0.2).toFixed(2);
+  if (!wd && hour >= 15 && hour <= 21) return +(1.1 + rand() * 0.5).toFixed(2);
+  return +(1.0 + rand() * 0.15).toFixed(2);
 }
 
 function makeEntry(
-  routeId: string,
-  daysAgo: number,
-  hour: number,
-  minute: number,
-  base: number,
-  variance: number,
-  notes?: string,
+  routeId: string, date: Date, km: number, min: number, notes?: string,
 ): RideEntry {
-  const d = new Date(2026, 2, 17); // March 17 2026 as anchor
-  d.setDate(d.getDate() - daysAgo);
-  d.setHours(hour, minute, 0, 0);
-
-  const isPeakMorning = hour >= 7 && hour <= 9;
-  const isPeakEvening = hour >= 17 && hour <= 19;
-  const isWeekend = d.getDay() === 0 || d.getDay() === 6;
-  const isLateNight = hour >= 22 || hour <= 4;
-
-  let surgeMultiplier = 1.0;
-  if (isPeakEvening && !isWeekend) surgeMultiplier = +(1.2 + rand() * 0.8).toFixed(1);
-  else if (isPeakMorning && !isWeekend) surgeMultiplier = +(1.1 + rand() * 0.4).toFixed(1);
-  else if (isLateNight && isWeekend) surgeMultiplier = +(1.3 + rand() * 1.0).toFixed(1);
-  else if (isWeekend && hour >= 10 && hour <= 15) surgeMultiplier = 1.0;
-
-  const surgedPrice = +(randomPrice(base, variance) * surgeMultiplier).toFixed(2);
-
+  const h = date.getHours();
+  const dow = date.getDay();
+  const surge = surgeFactor(h, dow);
   return {
-    id: uid(),
-    routeId,
-    price: surgedPrice,
+    id: uid(), routeId,
+    price: uberFare(km, min, surge),
     currency: 'CAD',
-    date: d.toISOString(),
-    dayOfWeek: d.getDay(),
-    hour,
-    surgeMultiplier: surgeMultiplier > 1 ? surgeMultiplier : undefined,
+    date: date.toISOString(),
+    dayOfWeek: dow, hour: h,
+    surgeMultiplier: surge > 1.1 ? +surge.toFixed(1) : undefined,
     notes,
   };
 }
 
+/* ── exact coordinates ───────────────────────────────── */
+const HOME:     [number, number] = [43.49256, -79.70551];
+const SCHOOL:   [number, number] = [43.46895, -79.69862];
+const AIRPORT:  [number, number] = [43.6777,  -79.6248];
+const DOWNTOWN: [number, number] = [43.6453,  -79.3806];
+
+const RD = {
+  school:   { km: 4.5,  min: 9 },
+  airport:  { km: 28,   min: 25 },
+  downtown: { km: 45,   min: 38 },
+};
+
 /* ── seed routes ─────────────────────────────────────── */
 export const seedRoutes: Route[] = [
   {
-    id: 'route-1',
-    name: 'Home → School',
+    id: 'route-1', name: 'Home → School',
     origin: '2374 Salcome Dr, Oakville ON L6H 7N3',
     destination: '1430 Trafalgar Rd, Oakville, ON L6H 2L1',
-    originCoords: [43.4298, -79.6870],
-    destCoords: [43.4697, -79.7085],
-    provider: 'Uber',
-    rideType: 'UberX',
+    originCoords: HOME, destCoords: SCHOOL,
+    provider: 'Uber', rideType: 'UberX',
     createdAt: '2026-01-15T10:00:00Z',
   },
   {
-    id: 'route-1r',
-    name: 'School → Home',
+    id: 'route-1r', name: 'School → Home',
     origin: '1430 Trafalgar Rd, Oakville, ON L6H 2L1',
     destination: '2374 Salcome Dr, Oakville ON L6H 7N3',
-    originCoords: [43.4697, -79.7085],
-    destCoords: [43.4298, -79.6870],
-    provider: 'Uber',
-    rideType: 'UberX',
+    originCoords: SCHOOL, destCoords: HOME,
+    provider: 'Uber', rideType: 'UberX',
     createdAt: '2026-01-15T10:05:00Z',
   },
   {
-    id: 'route-2',
-    name: 'Home → Airport',
+    id: 'route-2', name: 'Home → Airport',
     origin: '2374 Salcome Dr, Oakville ON L6H 7N3',
     destination: 'Toronto Pearson International Airport (YYZ)',
-    originCoords: [43.4298, -79.6870],
-    destCoords: [43.6777, -79.6248],
-    provider: 'Uber',
-    rideType: 'UberX',
+    originCoords: HOME, destCoords: AIRPORT,
+    provider: 'Uber', rideType: 'UberX',
     createdAt: '2026-02-01T14:00:00Z',
   },
   {
-    id: 'route-2r',
-    name: 'Airport → Home',
+    id: 'route-2r', name: 'Airport → Home',
     origin: 'Toronto Pearson International Airport (YYZ)',
     destination: '2374 Salcome Dr, Oakville ON L6H 7N3',
-    originCoords: [43.6777, -79.6248],
-    destCoords: [43.4298, -79.6870],
-    provider: 'Lyft',
-    rideType: 'Lyft Standard',
+    originCoords: AIRPORT, destCoords: HOME,
+    provider: 'Lyft', rideType: 'Lyft Standard',
     createdAt: '2026-02-01T14:05:00Z',
   },
   {
-    id: 'route-3',
-    name: 'Home → Downtown',
+    id: 'route-3', name: 'Home → Downtown',
     origin: '2374 Salcome Dr, Oakville ON L6H 7N3',
     destination: 'Union Station, 65 Front St W, Toronto, ON M5J 1E6',
-    originCoords: [43.4298, -79.6870],
-    destCoords: [43.6453, -79.3806],
-    provider: 'Uber',
-    rideType: 'UberX',
+    originCoords: HOME, destCoords: DOWNTOWN,
+    provider: 'Uber', rideType: 'UberX',
     createdAt: '2026-02-15T09:00:00Z',
   },
   {
-    id: 'route-3r',
-    name: 'Downtown → Home',
+    id: 'route-3r', name: 'Downtown → Home',
     origin: 'Union Station, 65 Front St W, Toronto, ON M5J 1E6',
     destination: '2374 Salcome Dr, Oakville ON L6H 7N3',
-    originCoords: [43.6453, -79.3806],
-    destCoords: [43.4298, -79.6870],
-    provider: 'Lyft',
-    rideType: 'Lyft Standard',
+    originCoords: DOWNTOWN, destCoords: HOME,
+    provider: 'Lyft', rideType: 'Lyft Standard',
     createdAt: '2026-02-15T09:05:00Z',
   },
 ];
 
-/* ── realistic seed entries ──────────────────────────── */
+/* ── seed entries ────────────────────────────────────── */
+/*
+  Schedule (anchor: Tue Mar 17 2026):
+    Tue  — class 9 AM–3 PM   (ride ~8:20–8:40, home ~3:00–3:20)
+    Wed  — class 8 AM–2 PM   (ride ~7:20–7:40, home ~2:00–2:20)
+    Fri  — class 9 AM–12 PM  (ride ~8:20–8:40, home ~12:00–12:20)
+    Mon  — NO rides
+    Thu / Sat / Sun — Downtown (out 8–12 AM, back 1–11 PM)
+  Airport — only 2 round-trips (Aug 2025, Jan 2026)
+  3 complete gap days with zero records
+*/
 export const seedEntries: RideEntry[] = (() => {
   const entries: RideEntry[] = [];
+  const anchor = new Date(2026, 2, 17); // Tue Mar 17
 
-  // Route 1: Home → School — weekday commute, ~4 days/week, some gaps
-  // Simulates a college student who sometimes drives, sometimes skips
-  const schoolDays = [
-    1, 2, 3, 5,     // week 1 (skipped Thu)
-    8, 9, 11, 12,   // week 2 (skipped Wed)
-    15, 16, 17, 18, 19, // week 3 (full week)
-    22, 23, 25, 26,  // week 4
-    29, 30, 32, 33,  // week 5
-    36, 37, 38, 40,  // week 6
-    43, 44, 46,      // week 7
-    50, 51, 52, 53,  // week 8
-  ];
+  const dt = (ago: number, h: number, m: number): Date => {
+    const d = new Date(anchor);
+    d.setDate(d.getDate() - ago);
+    d.setHours(h, m, 0, 0);
+    return d;
+  };
 
-  for (const d of schoolDays) {
-    const morningMinute = Math.floor(rand() * 30) + 10; // 7:10–7:40 or 8:10–8:40
-    const morningHour = rand() > 0.4 ? 8 : 7;
-    entries.push(makeEntry('route-1', d, morningHour, morningMinute, 12, 2.5));
+  const GAPS = new Set([9, 26, 46]); // Sun Mar 8, Thu Feb 19, Fri Jan 30
+
+  for (let ago = 0; ago < 70; ago++) {
+    if (GAPS.has(ago)) continue;
+    const sample = new Date(anchor);
+    sample.setDate(sample.getDate() - ago);
+    const dow = sample.getDay();
+
+    if (dow === 1) continue; // Monday — never ride
+
+    /* ── School days ── */
+    if (dow === 2) { // Tuesday 9 AM–3 PM
+      entries.push(makeEntry('route-1', dt(ago, 8, 20 + Math.floor(rand() * 20)),
+        RD.school.km, RD.school.min));
+      if (rand() > 0.25)
+        entries.push(makeEntry('route-1r', dt(ago, 15, Math.floor(rand() * 20)),
+          RD.school.km, RD.school.min));
+    }
+    if (dow === 3) { // Wednesday 8 AM–2 PM
+      entries.push(makeEntry('route-1', dt(ago, 7, 20 + Math.floor(rand() * 20)),
+        RD.school.km, RD.school.min));
+      if (rand() > 0.25)
+        entries.push(makeEntry('route-1r', dt(ago, 14, Math.floor(rand() * 20)),
+          RD.school.km, RD.school.min));
+    }
+    if (dow === 5) { // Friday 9 AM–12 PM
+      entries.push(makeEntry('route-1', dt(ago, 8, 20 + Math.floor(rand() * 20)),
+        RD.school.km, RD.school.min));
+      if (rand() > 0.25)
+        entries.push(makeEntry('route-1r', dt(ago, 12, Math.floor(rand() * 20)),
+          RD.school.km, RD.school.min));
+    }
+
+    /* ── Downtown days (Thu / Sat / Sun) ── */
+    if ((dow === 4 || dow === 0 || dow === 6) && rand() > 0.15) {
+      const outH = 8 + Math.floor(rand() * 4);
+      entries.push(makeEntry('route-3', dt(ago, outH, Math.floor(rand() * 50)),
+        RD.downtown.km, RD.downtown.min));
+      const retH = 13 + Math.floor(rand() * 10);
+      entries.push(makeEntry('route-3r', dt(ago, retH, Math.floor(rand() * 50)),
+        RD.downtown.km, RD.downtown.min,
+        retH >= 21 ? 'Late night return' : undefined));
+    }
   }
 
-  // Route 1r: School → Home — fewer entries (sometimes gets a ride from friends)
-  const returnDays = schoolDays.filter(() => rand() > 0.35);
-  for (const d of returnDays) {
-    const pm = rand() > 0.5 ? 16 : 15;
-    const minute = Math.floor(rand() * 45) + 5;
-    entries.push(makeEntry('route-1r', d, pm, minute, 11.5, 2));
-  }
+  /* ── Airport: exactly 2 round-trips (4 entries) ── */
+  entries.push(makeEntry('route-2',
+    new Date(2025, 7, 15, 6, 30), RD.airport.km, RD.airport.min,
+    'Early morning flight'));
+  entries.push(makeEntry('route-2r',
+    new Date(2025, 7, 25, 21, 45), RD.airport.km, RD.airport.min,
+    'Late arrival — delayed flight'));
+  entries.push(makeEntry('route-2',
+    new Date(2026, 0, 3, 14, 15), RD.airport.km, RD.airport.min,
+    'Winter break trip'));
+  entries.push(makeEntry('route-2r',
+    new Date(2026, 0, 12, 19, 20), RD.airport.km, RD.airport.min));
 
-  // Route 2: Home → Airport — very low frequency, ~1-2 trips per month
-  const airportOutDays = [3, 18, 39, 54];
-  for (const d of airportOutDays) {
-    const h = [5, 6, 14, 15][Math.floor(rand() * 4)];
-    const m = Math.floor(rand() * 50);
-    entries.push(makeEntry('route-2', d, h, m, 38, 7,
-      h < 7 ? 'Early morning flight' : undefined));
-  }
-
-  // Route 2r: Airport → Home
-  const airportReturnDays = [6, 21, 42, 56];
-  for (const d of airportReturnDays) {
-    const h = [18, 20, 22, 23][Math.floor(rand() * 4)];
-    const m = Math.floor(rand() * 50);
-    entries.push(makeEntry('route-2r', d, h, m, 40, 8,
-      h >= 22 ? 'Late arrival, tired' : undefined));
-  }
-
-  // Route 3: Home → Downtown — weekend social outings + occasional weekday evening
-  const downtownOutDays = [
-    6, 7, 13, 14, 20, 21, 27, 28, // weekends over 8 weeks
-    4, 11, 25, 32, 46, // occasional weekday evenings
-  ];
-  for (const d of downtownOutDays) {
-    const isWeekday = new Date(2026, 2, 17 - d).getDay() >= 1 && new Date(2026, 2, 17 - d).getDay() <= 5;
-    const h = isWeekday ? (rand() > 0.5 ? 18 : 19) : (10 + Math.floor(rand() * 6));
-    const m = Math.floor(rand() * 55);
-    entries.push(makeEntry('route-3', d, h, m, 32, 6,
-      isWeekday ? 'Dinner plans' : undefined));
-  }
-
-  // Route 3r: Downtown → Home — return trips, sometimes late night
-  const downtownReturnDays = [
-    6, 7, 13, 14, 20, 21, 27, 28,
-    4, 11, 25, 32, 46,
-  ];
-  for (const d of downtownReturnDays) {
-    const isWeekday = new Date(2026, 2, 17 - d).getDay() >= 1 && new Date(2026, 2, 17 - d).getDay() <= 5;
-    const h = isWeekday ? (21 + Math.floor(rand() * 2)) : (20 + Math.floor(rand() * 4));
-    const m = Math.floor(rand() * 55);
-    entries.push(makeEntry('route-3r', d, h, m, 35, 7,
-      h >= 23 ? 'Late night surge' : undefined));
-  }
-
-  return entries.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  return entries.sort((a, b) =>
+    new Date(a.date).getTime() - new Date(b.date).getTime());
 })();
 
-/* ── onboarding steps ────────────────────────────────── */
-export const onboardingSteps: OnboardingStep[] = [
-  {
-    title: 'Ride prices change constantly.',
-    body: 'The same trip can cost $12 at 2 PM and $28 at 5 PM. Surge pricing, demand spikes, and driver availability create patterns that repeat — and you can learn to predict them.',
-    visual: 'wave',
-  },
-  {
-    title: 'When is the right time to leave?',
-    body: "Should you book now or wait 20 minutes for a better price? FareWind turns that guesswork into a data-informed decision — powered entirely by the prices you log.",
-    visual: 'clock',
-  },
-  {
-    title: 'Your data builds the picture.',
-    body: 'Each time you log a ride price, FareWind adds it to your personal history. Over time, you see exactly which hours, days, and routes cost the most — no APIs, no account linking, no tracking.',
-    visual: 'chart',
-  },
-  {
-    title: 'Smart timing, real savings.',
-    body: 'With enough data points, FareWind tells you whether right now is a good time to ride, suggests cheaper windows, and flags time slots to avoid. Small timing shifts can save you hundreds per year.',
-    visual: 'spark',
-  },
-];

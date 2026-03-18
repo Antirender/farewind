@@ -25,13 +25,6 @@ export interface RideEntry {
   notes?: string;
 }
 
-export interface HeatmapCell {
-  day: number;
-  hour: number;
-  avgPrice: number;
-  count: number;
-}
-
 export interface Recommendation {
   id: string;
   routeId: string;
@@ -42,16 +35,4 @@ export interface Recommendation {
   estimatedSaving?: number;
 }
 
-export type OnboardingStep = {
-  title: string;
-  body: string;
-  visual: 'wave' | 'clock' | 'chart' | 'spark';
-};
-
-export type ThemeMode = 'light' | 'dark';
-
-export interface UserPreferences {
-  theme: ThemeMode;
-  hasOnboarded: boolean;
-  defaultCurrency: string;
-}
+export type ThemeMode = 'light' | 'dark' | 'pink' | 'blue';

@@ -10,6 +10,12 @@
   margin-bottom: 1.25rem;
 }
 
+.headerBtns {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
 .heading {
   font-size: 1.5rem;
   font-weight: 700;
@@ -51,6 +57,13 @@
   gap: 0.5rem;
 }
 
+.cardTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
 .routeNick {
   font-weight: 700;
   font-size: 1.0625rem;
@@ -62,17 +75,6 @@
   color: var(--color-text-muted);
   line-height: 1.5;
   margin-top: -0.25rem;
-}
-
-.arrow {
-  color: var(--color-primary-light);
-  font-weight: 700;
-}
-
-.routeName {
-  font-weight: 600;
-  font-size: 0.9375rem;
-  color: var(--color-text);
 }
 
 .meta {
@@ -127,54 +129,4 @@
 .deleteBtn:hover {
   color: var(--color-danger);
   background: rgba(248, 113, 113, 0.1);
-}
-
-/* ── New route form ───────────────────── */
-.formCard {
-  margin-bottom: 1.25rem;
-}
-
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.formTitle {
-  font-size: 1rem;
-  font-weight: 700;
-}
-
-.formRow {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
-}
-
-.fieldLabel {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--color-text-secondary);
-}
-
-.fieldInput {
-  padding: 0.5rem 0.625rem;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border);
-  background: var(--color-surface-alt);
-  color: var(--color-text);
-  font-size: 0.8125rem;
-}
-.fieldInput:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px var(--color-primary-bg);
-}
-
-.formError {
-  font-size: 0.75rem;
-  color: var(--color-danger);
 }

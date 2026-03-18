@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { MapContainer, TileLayer, Marker, Polyline, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -24,7 +24,7 @@ const ROUTE_COLORS = [
 
 function FitBounds({ bounds }: { bounds: L.LatLngBoundsExpression }) {
   const map = useMap();
-  useMemo(() => {
+  useEffect(() => {
     map.fitBounds(bounds, { padding: [40, 40] });
   }, [map, bounds]);
   return null;

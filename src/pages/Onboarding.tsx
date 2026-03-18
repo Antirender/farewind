@@ -9,26 +9,31 @@ const STEPS = [
     title: 'Welcome to FareWind',
     body: 'Track your ride-hailing costs and discover the best times to book — saving you money on every trip.',
     visual: '🌊',
+    hint: 'Scroll down to continue',
   },
   {
     title: 'Log Your Rides',
-    body: 'Record the price, time, and surge multiplier each time you take a ride. FareWind learns from your history.',
+    body: 'After each ride, record the fare, time, and surge multiplier. It takes 10 seconds — FareWind does the rest.',
     visual: '📝',
+    hint: 'One entry per ride is all you need',
   },
   {
     title: 'Spot the Patterns',
-    body: 'Interactive charts and heatmaps reveal when prices are lowest — by hour, day, and route.',
+    body: 'Interactive charts and heatmaps reveal when prices are lowest — by hour, day, and route. See your data come alive.',
     visual: '📊',
+    hint: 'Works best with 10+ rides logged',
   },
   {
     title: 'Get Smart Advice',
-    body: 'Personalised recommendations tell you the cheapest window to book, backed by your real data.',
+    body: 'Personalised recommendations tell you the cheapest window to book, backed by your real data — not estimates.',
     visual: '💡',
+    hint: 'All analysis happens on your device',
   },
   {
-    title: 'Ready to Go',
-    body: 'Your data stays on this device. No account needed. Start logging your first ride!',
+    title: 'Ready to Go!',
+    body: 'Your data stays on this device. No account, no tracking. We\'ve loaded 6 demo routes so you can explore right away.',
     visual: '🚀',
+    hint: null,
   },
 ];
 
@@ -54,8 +59,15 @@ export default function Onboarding() {
     return () => scrollerRef.current?.destroy();
   }, [handleStepEnter]);
 
+  const progress = ((currentStep + 1) / STEPS.length) * 100;
+
   return (
     <div className={styles.page} ref={containerRef}>
+      {/* Progress bar at top */}
+      <div className={styles.progressBar}>
+        <div className={styles.progressFill} style={{ width: `${progress}%` }} />
+      </div>
+
       {/* Sticky visual panel */}
       <div className={styles.stickyPanel}>
         <div className={styles.visual} key={currentStep}>
@@ -64,10 +76,10 @@ export default function Onboarding() {
         {/* Progress dots */}
         <div className={styles.dots}>
           {STEPS.map((_, i) => (
-            <span key={i} className={`${styles.dot} ${i === currentStep ? styles.dotActive : ''}`} />
+            <span key={i} className={`${styles.dot} ${i === currentStep ? styles.dotActive : ''} ${i < currentStep ? styles.dotDone : ''}`} />
           ))}
         </div>
-        <span className={styles.counter}>{currentStep + 1} / {STEPS.length}</span>
+        <span className={styles.counter}>Step {currentStep + 1} of {STEPS.length}</span>
       </div>
 
       {/* Scrollable text steps */}
@@ -80,9 +92,10 @@ export default function Onboarding() {
           >
             <h2 className={styles.title}>{s.title}</h2>
             <p className={styles.body}>{s.body}</p>
+            {s.hint && <p className={styles.hint}>{s.hint}</p>}
             {i === STEPS.length - 1 && (
               <Button size="lg" onClick={completeOnboarding} style={{ marginTop: '1.5rem' }}>
-                Get Started
+                🚀 Get Started
               </Button>
             )}
           </div>
