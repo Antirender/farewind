@@ -2,8 +2,72 @@ import { useMemo } from 'react';
 import { useApp } from '../context/AppContext';
 import Card from '../components/ui/Card';
 import Badge from '../components/ui/Badge';
+import { formatDistance, formatDuration } from '../utils/routing';
 import type { Recommendation as Rec } from '../types';
 import styles from './Recommendation.module.css';
+
+/* ── Baseline analysis per route ────── */
+interface BaselineInfo {
+  routeId: string;
+  routeName: string;
+  totalSpent: number;
+  rideCount: number;
+  avgFare: number;
+  cheapestHourAvg: number;
+  cheapestHour: number;
+  baselineTotal: number; // what you'd spend if always at cheapest hour
+  overspend: number;     // totalSpent - baselineTotal
+  distance?: number;
+  duration?: number;
+}
+
+function analyzeBaseline(
+  routes: ReturnType<typeof useApp>['routes'],
+  entries: ReturnType<typeof useApp>['entries'],
+): BaselineInfo[] {
+  const infos: BaselineInfo[] = [];
+  for (const route of routes) {
+    const re = entries.filter((e) => e.routeId === route.id);
+    if (re.length < 3) continue;
+
+    const totalSpent = re.reduce((s, e) => s + e.price, 0);
+    const avgFare = totalSpent / re.length;
+
+    // Find cheapest avg hour
+    const byHour: Record<number, number[]> = {};
+    for (const e of re) {
+      const h = new Date(e.date).getHours();
+      (byHour[h] ??= []).push(e.price);
+    }
+    let cheapestHour = 0;
+    let cheapestHourAvg = Infinity;
+    for (const [h, prices] of Object.entries(byHour)) {
+      const avg = prices.reduce((a, b) => a + b, 0) / prices.length;
+      if (avg < cheapestHourAvg) {
+        cheapestHourAvg = avg;
+        cheapestHour = parseInt(h);
+      }
+    }
+
+    const baselineTotal = cheapestHourAvg * re.length;
+    const overspend = totalSpent - baselineTotal;
+
+    infos.push({
+      routeId: route.id,
+      routeName: route.name,
+      totalSpent,
+      rideCount: re.length,
+      avgFare,
+      cheapestHourAvg,
+      cheapestHour,
+      baselineTotal,
+      overspend,
+      distance: route.distance,
+      duration: route.duration,
+    });
+  }
+  return infos;
+}
 
 function generateRecommendations(
   routes: ReturnType<typeof useApp>['routes'],
@@ -105,11 +169,107 @@ function generateRecommendations(
 export default function Recommendation() {
   const { routes, entries } = useApp();
   const recs = useMemo(() => generateRecommendations(routes, entries), [routes, entries]);
+  const baselines = useMemo(() => analyzeBaseline(routes, entries), [routes, entries]);
+
+  const totalSpent = baselines.reduce((s, b) => s + b.totalSpent, 0);
+  const totalOverspend = baselines.reduce((s, b) => s + Math.max(0, b.overspend), 0);
+  const totalRides = baselines.reduce((s, b) => s + b.rideCount, 0);
 
   return (
     <div className={styles.page}>
       <h1 className={styles.heading}>Smart Advice</h1>
       <p className={styles.sub}>Personalised recommendations based on your ride history.</p>
+
+      {/* Spending overview */}
+      {baselines.length > 0 && (
+        <Card padding="sm" className={styles.overviewCard}>
+          <h3 className={styles.overviewTitle}>Spending Overview</h3>
+          <div className={styles.overviewGrid}>
+            <div className={styles.overviewStat}>
+              <span className={styles.overviewValue}>${totalSpent.toFixed(2)}</span>
+              <span className={styles.overviewLabel}>Total spent</span>
+            </div>
+            <div className={styles.overviewStat}>
+              <span className={styles.overviewValue} style={{ color: 'var(--color-danger)' }}>
+                +${totalOverspend.toFixed(2)}
+              </span>
+              <span className={styles.overviewLabel}>Above baseline</span>
+            </div>
+            <div className={styles.overviewStat}>
+              <span className={styles.overviewValue}>{totalRides}</span>
+              <span className={styles.overviewLabel}>Total rides</span>
+            </div>
+          </div>
+          <p className={styles.overviewExplain}>
+            "Above baseline" = extra money spent compared to always riding at your cheapest hour.
+          </p>
+        </Card>
+      )}
+
+      {/* Per-route baseline cards */}
+      {baselines.length > 0 && (
+        <div className={styles.baselineList}>
+          {baselines.map((b) => (
+            <Card key={b.routeId} padding="sm" className={styles.baselineCard}>
+              <div className={styles.baselineHeader}>
+                <span className={styles.baselineName}>{b.routeName}</span>
+                {b.overspend > 0 && (
+                  <span className={styles.baselineOverspend}>+${b.overspend.toFixed(2)} overspend</span>
+                )}
+              </div>
+              <div className={styles.baselineStats}>
+                <div>
+                  <span className={styles.baselineStatLabel}>Rides</span>
+                  <span className={styles.baselineStatValue}>{b.rideCount}</span>
+                </div>
+                <div>
+                  <span className={styles.baselineStatLabel}>Avg fare</span>
+                  <span className={styles.baselineStatValue}>${b.avgFare.toFixed(2)}</span>
+                </div>
+                <div>
+                  <span className={styles.baselineStatLabel}>Best hour</span>
+                  <span className={styles.baselineStatValue}>{b.cheapestHour}:00 · ${b.cheapestHourAvg.toFixed(2)}</span>
+                </div>
+                {b.distance != null && (
+                  <div>
+                    <span className={styles.baselineStatLabel}>Distance</span>
+                    <span className={styles.baselineStatValue}>{formatDistance(b.distance)}</span>
+                  </div>
+                )}
+                {b.duration != null && (
+                  <div>
+                    <span className={styles.baselineStatLabel}>Drive time</span>
+                    <span className={styles.baselineStatValue}>{formatDuration(b.duration)}</span>
+                  </div>
+                )}
+              </div>
+              {/* Visual: actual vs baseline bar */}
+              <div className={styles.barWrap}>
+                <div className={styles.barRow}>
+                  <span className={styles.barLabel}>Actual</span>
+                  <div className={styles.barTrack}>
+                    <div className={styles.barFillActual} style={{ width: '100%' }} />
+                  </div>
+                  <span className={styles.barValue}>${b.totalSpent.toFixed(0)}</span>
+                </div>
+                <div className={styles.barRow}>
+                  <span className={styles.barLabel}>Baseline</span>
+                  <div className={styles.barTrack}>
+                    <div
+                      className={styles.barFillBaseline}
+                      style={{ width: `${b.totalSpent > 0 ? (b.baselineTotal / b.totalSpent) * 100 : 100}%` }}
+                    />
+                  </div>
+                  <span className={styles.barValue}>${b.baselineTotal.toFixed(0)}</span>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {/* Recommendations */}
+      <h2 className={styles.sectionTitle}>Actionable Tips</h2>
 
       {recs.length === 0 ? (
         <Card>

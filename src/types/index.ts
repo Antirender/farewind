@@ -8,6 +8,9 @@ export interface Route {
   provider: string;
   rideType: string;
   createdAt: string;
+  routeGeometry?: [number, number][]; // polyline coords [lat, lng][]
+  distance?: number; // meters
+  duration?: number; // seconds
 }
 
 export interface RideEntry {

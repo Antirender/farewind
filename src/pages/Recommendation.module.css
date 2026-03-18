@@ -20,6 +20,172 @@
   color: var(--color-text-muted);
 }
 
+/* ── Spending overview card ──────────── */
+.overviewCard {
+  margin-bottom: 1.25rem;
+}
+
+.overviewTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.overviewGrid {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.overviewStat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.overviewValue {
+  font-family: var(--font-mono);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.overviewLabel {
+  font-size: 0.6875rem;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.overviewExplain {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin-top: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--color-border);
+  font-style: italic;
+}
+
+/* ── Per-route baseline cards ────────── */
+.baselineList {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .baselineList { grid-template-columns: repeat(2, 1fr); }
+}
+
+.baselineCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.baselineHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.baselineName {
+  font-weight: 700;
+  font-size: 0.9375rem;
+  color: var(--color-text);
+}
+
+.baselineOverspend {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-danger);
+}
+
+.baselineStats {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.baselineStatLabel {
+  display: block;
+  font-size: 0.625rem;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.baselineStatValue {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* ── Actual vs baseline bar ──────────── */
+.barWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.barRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.barLabel {
+  font-size: 0.625rem;
+  color: var(--color-text-muted);
+  width: 48px;
+  flex-shrink: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.barTrack {
+  flex: 1;
+  height: 8px;
+  background: var(--color-surface-alt);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.barFillActual {
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: 4px;
+}
+
+.barFillBaseline {
+  height: 100%;
+  background: var(--color-success);
+  border-radius: 4px;
+}
+
+.barValue {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--color-text-secondary);
+  width: 40px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* ── Section title ───────────────────── */
+.sectionTitle {
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+/* ── Recommendation cards ────────────── */
 .list {
   display: flex;
   flex-direction: column;

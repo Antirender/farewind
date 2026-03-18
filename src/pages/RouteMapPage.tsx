@@ -1,10 +1,11 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { MapContainer, TileLayer, Marker, Polyline, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useApp } from '../context/AppContext';
 import Card from '../components/ui/Card';
 import Badge from '../components/ui/Badge';
+import { fetchRoute, formatDistance, formatDuration } from '../utils/routing';
 import styles from './RouteMapPage.module.css';
 
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
@@ -30,8 +31,28 @@ function FitBounds({ bounds }: { bounds: L.LatLngBoundsExpression }) {
 }
 
 export default function RouteMapPage() {
-  const { routes, entries } = useApp();
+  const { routes, entries, updateRoute } = useApp();
   const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  // Fetch road geometry for routes that don't have it yet
+  const fetchMissing = useCallback(async () => {
+    for (const r of routes) {
+      if (!r.routeGeometry) {
+        const result = await fetchRoute(r.originCoords, r.destCoords);
+        if (result) {
+          updateRoute(r.id, {
+            routeGeometry: result.geometry,
+            distance: result.distance,
+            duration: result.duration,
+          });
+        }
+      }
+    }
+  }, [routes, updateRoute]);
+
+  useEffect(() => {
+    fetchMissing();
+  }, [fetchMissing]);
 
   const routeStats = useMemo(() => {
     const stats: Record<string, { count: number; avg: number; lastRide: string }> = {};
@@ -52,8 +73,11 @@ export default function RouteMapPage() {
   }, [routes, entries]);
 
   const bounds = useMemo<L.LatLngBoundsExpression>(() => {
-    const lats = routes.flatMap((r) => [r.originCoords[0], r.destCoords[0]]);
-    const lngs = routes.flatMap((r) => [r.originCoords[1], r.destCoords[1]]);
+    const allCoords = routes.flatMap((r) =>
+      r.routeGeometry ?? [r.originCoords, r.destCoords],
+    );
+    const lats = allCoords.map((c) => c[0]);
+    const lngs = allCoords.map((c) => c[1]);
     return [
       [Math.min(...lats) - 0.02, Math.min(...lngs) - 0.02],
       [Math.max(...lats) + 0.02, Math.max(...lngs) + 0.02],
@@ -84,12 +108,17 @@ export default function RouteMapPage() {
                   <span className={styles.routeNick}>{r.name}</span>
                   <span className={styles.routeAddr}>{r.origin} → {r.destination}</span>
                   <div className={styles.routeMeta}>
-                    <Badge color={st.count > 10 ? 'success' : 'neutral'} >
+                    <Badge color={st.count > 10 ? 'success' : 'neutral'}>
                       {`${st.count} rides`}
                     </Badge>
                     <span className={styles.routeAvg}>
                       avg ${st.avg.toFixed(2)}
                     </span>
+                    {r.distance != null && (
+                      <span className={styles.routeAvg}>
+                        {formatDistance(r.distance)}
+                      </span>
+                    )}
                   </div>
                 </div>
               </button>
@@ -116,14 +145,15 @@ export default function RouteMapPage() {
             const isActive = selectedId === r.id || selectedId === null;
             const weight = selectedId === r.id ? 5 : 3;
             const opacity = isActive ? 0.9 : 0.15;
+            const positions = r.routeGeometry ?? [r.originCoords, r.destCoords];
             return (
               <Polyline
                 key={r.id}
-                positions={[r.originCoords, r.destCoords]}
+                positions={positions}
                 pathOptions={{
                   color,
                   weight,
-                  dashArray: selectedId === r.id ? undefined : '8 6',
+                  dashArray: r.routeGeometry ? undefined : '8 6',
                   opacity,
                 }}
                 eventHandlers={{ click: () => setSelectedId(r.id) }}
@@ -178,6 +208,18 @@ export default function RouteMapPage() {
                 <span className={styles.overlayStatLabel}>Avg fare</span>
                 <span className={styles.overlayStatValue}>${routeStats[selected.id].avg.toFixed(2)}</span>
               </div>
+              {selected.distance != null && (
+                <div>
+                  <span className={styles.overlayStatLabel}>Distance</span>
+                  <span className={styles.overlayStatValue}>{formatDistance(selected.distance)}</span>
+                </div>
+              )}
+              {selected.duration != null && (
+                <div>
+                  <span className={styles.overlayStatLabel}>Drive time</span>
+                  <span className={styles.overlayStatValue}>{formatDuration(selected.duration)}</span>
+                </div>
+              )}
               <div>
                 <span className={styles.overlayStatLabel}>Last ride</span>
                 <span className={styles.overlayStatValue}>{routeStats[selected.id].lastRide}</span>

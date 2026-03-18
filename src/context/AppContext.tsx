@@ -13,7 +13,8 @@ import { seedRoutes, seedEntries } from '../data/seed';
 const STORAGE_KEYS = {
   theme: 'fw_theme',
   onboarded: 'fw_onboarded',
-  currency: 'fw_currency',
+  routes: 'fw_routes',
+  entries: 'fw_entries',
 } as const;
 
 function loadBool(key: string, fallback: boolean): boolean {
@@ -34,6 +35,16 @@ function loadString<T extends string>(key: string, fallback: T): T {
   }
 }
 
+function loadJSON<T>(key: string, fallback: T): T {
+  try {
+    const v = localStorage.getItem(key);
+    if (v === null) return fallback;
+    return JSON.parse(v) as T;
+  } catch {
+    return fallback;
+  }
+}
+
 function save(key: string, value: string) {
   try {
     localStorage.setItem(key, value);
@@ -47,6 +58,8 @@ interface AppState {
   hasOnboarded: boolean;
   theme: ThemeMode;
   addRoute: (route: Omit<Route, 'id' | 'createdAt'>) => Route;
+  updateRoute: (id: string, patch: Partial<Route>) => void;
+  deleteRoute: (id: string) => void;
   addEntry: (entry: Omit<RideEntry, 'id' | 'dayOfWeek' | 'hour'>) => void;
   completeOnboarding: () => void;
   resetOnboarding: () => void;
@@ -57,18 +70,25 @@ interface AppState {
 
 const AppContext = createContext<AppState | null>(null);
 
-let nextRouteId = seedRoutes.length + 100;
-let nextEntryId = seedEntries.length + 100;
+let nextId = Date.now();
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [routes, setRoutes] = useState<Route[]>(seedRoutes);
-  const [entries, setEntries] = useState<RideEntry[]>(seedEntries);
+  const [routes, setRoutes] = useState<Route[]>(() =>
+    loadJSON(STORAGE_KEYS.routes, seedRoutes),
+  );
+  const [entries, setEntries] = useState<RideEntry[]>(() =>
+    loadJSON(STORAGE_KEYS.entries, seedEntries),
+  );
   const [hasOnboarded, setHasOnboarded] = useState(() =>
     loadBool(STORAGE_KEYS.onboarded, false),
   );
   const [theme, setTheme] = useState<ThemeMode>(() =>
     loadString(STORAGE_KEYS.theme, 'dark'),
   );
+
+  // Persist routes & entries
+  useEffect(() => { save(STORAGE_KEYS.routes, JSON.stringify(routes)); }, [routes]);
+  useEffect(() => { save(STORAGE_KEYS.entries, JSON.stringify(entries)); }, [entries]);
 
   // Sync theme to <html> attribute and localStorage
   useEffect(() => {
@@ -83,11 +103,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const addRoute = useCallback((partial: Omit<Route, 'id' | 'createdAt'>) => {
     const route: Route = {
       ...partial,
-      id: `route-${nextRouteId++}`,
+      id: `route-${nextId++}`,
       createdAt: new Date().toISOString(),
     };
     setRoutes((prev) => [...prev, route]);
     return route;
+  }, []);
+
+  const updateRoute = useCallback((id: string, patch: Partial<Route>) => {
+    setRoutes((prev) => prev.map((r) => (r.id === id ? { ...r, ...patch } : r)));
+  }, []);
+
+  const deleteRoute = useCallback((id: string) => {
+    setRoutes((prev) => prev.filter((r) => r.id !== id));
+    setEntries((prev) => prev.filter((e) => e.routeId !== id));
   }, []);
 
   const addEntry = useCallback(
@@ -95,7 +124,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const d = new Date(partial.date);
       const entry: RideEntry = {
         ...partial,
-        id: `entry-${nextEntryId++}`,
+        id: `entry-${nextId++}`,
         dayOfWeek: d.getDay(),
         hour: d.getHours(),
       };
@@ -129,6 +158,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
         hasOnboarded,
         theme,
         addRoute,
+        updateRoute,
+        deleteRoute,
         addEntry,
         completeOnboarding,
         resetOnboarding,
